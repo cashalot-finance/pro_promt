@@ -1,0 +1,72 @@
+# ⚠️ КРИТИЧЕСКАЯ ЗАВИСИМОСТЬ ⚠️
+# huggingface_hub ДОЛЖЕН быть установлен первым и отдельно от других зависимостей
+# для предотвращения конфликтов версий
+huggingface_hub==0.23.0
+
+# --- Core Framework & Server ---
+# FastAPI: Современный веб-фреймворк для создания API.
+fastapi==0.111.0
+# Uvicorn: ASGI сервер для запуска FastAPI.
+# [standard] включает доп. зависимости: websockets, httptools, uvloop, python-dotenv.
+uvicorn[standard]==0.29.0
+
+# --- Data Validation & Settings ---
+# Pydantic: Для валидации данных и управления настройками.
+pydantic==2.7.1
+# Pydantic-Settings: Расширение Pydantic для загрузки настроек из .env и других источников.
+pydantic-settings==2.2.1
+# python-dotenv: Загрузка переменных окружения из .env файла (также включен в uvicorn[standard], но явно указан для ясности).
+python-dotenv==1.0.1
+
+# --- Database ---
+# SQLAlchemy: Мощный ORM для работы с базами данных. Версия 2.x обязательна для async.
+sqlalchemy==2.0.30
+# Alembic: Инструмент для миграций схемы базы данных SQLAlchemy.
+alembic==1.13.1
+# --- Async Database Drivers (выберите один или несколько) ---
+# aiosqlite: Асинхронный драйвер для SQLite (используется по умолчанию).
+aiosqlite==0.20.0
+# asyncpg: Асинхронный драйвер для PostgreSQL (раскомментируйте, если используете PostgreSQL).
+# asyncpg==0.29.0
+
+# --- Security ---
+# PyJWT: Для работы с JWT-токенами аутентификации
+PyJWT==2.8.0
+# Cryptography: Для шифрования/дешифрования API ключей в базе данных.
+cryptography==42.0.7
+# Passlib: Для хеширования паролей (опционально)
+passlib==1.7.4
+
+# --- Async Utilities ---
+# aiofiles: Для асинхронной работы с файлами (используется FastAPI для FileResponse).
+aiofiles==23.2.1
+# httpx: Современный HTTP-клиент с поддержкой асинхронных запросов
+httpx==0.26.0
+# aiohttp: Асинхронный HTTP-клиент и сервер
+aiohttp==3.9.5
+
+# --- Сетевые Утилиты ---
+# requests: HTTP-клиент для синхронных запросов
+requests==2.31.0
+# netifaces: Для получения информации о сетевых интерфейсах
+netifaces==0.11.0
+
+# --- LLM Provider Libraries ---
+# OpenAI: Клиент для OpenAI API (GPT модели).
+openai==1.30.1
+# Google AI: Клиент для Google Gemini API.
+google-generativeai==0.6.0
+# Anthropic: Клиент для Anthropic Claude API.
+anthropic==0.27.0
+# Mistral AI: Клиент для Mistral AI API.
+mistralai==0.3.0
+# Groq: Клиент для Groq API (быстрый инференс).
+groq==0.8.0
+
+# --- Системный Мониторинг ---
+# psutil: Библиотека для получения информации о системе и процессах
+psutil==5.9.5
+
+# --- Опционально: Logging ---
+# loguru: Удобная библиотека для логирования (альтернатива стандартному logging).
+loguru==0.7.2

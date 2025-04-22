@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  prompt-arena:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./data:/app/data
+      - ./frontend:/app/frontend
+    environment:
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-xVgbLAr0R7Pbw4IbSgVeUNmvz7T3YZ8sJq2M5oXH6fA=}
+      - DATABASE_URL=sqlite+aiosqlite:///./data/prompt_arena.db
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=["*"]
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload 

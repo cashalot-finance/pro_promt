@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Промт Арена - платформа для тестирования и сравнения моделей искусственного интеллекта">
+    <meta name="theme-color" content="#4f46e5">
+    <title>Промт Арена - Сравнивайте и тестируйте модели ИИ</title>
+    
+    <!-- Preconnect и DNS prefetch для ускорения загрузки CDN -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- Стили -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0/min/vs/editor/editor.main.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    
+    <!-- Шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Верхняя панель -->
+        <header>
+            <div class="container">
+                <h1>Промт Арена</h1>
+                <div class="flex space-x-4">
+                    <button id="setup-keys-btn" class="btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd" />
+                        </svg>
+                        API-ключи
+                    </button>
+                    <button id="view-leaderboard-btn" class="btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M5 3a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                        </svg>
+                        Лидерборд
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main>
+            <!-- Боковая панель (категории и модели) -->
+            <aside id="sidebar">
+                <!-- Поиск моделей -->
+                <div id="model-search-container">
+                    <input type="text" id="model-search" placeholder="Поиск модели..." aria-label="Поиск модели">
+                </div>
+                
+                <!-- Категории -->
+                <div class="category-section">
+                    <h2 class="category-section-title">Категории</h2>
+                    <div id="categories-container">
+                        <!-- Сюда будут добавляться категории через JavaScript -->
+                        <div class="skeleton h-8 mb-2"></div>
+                        <div class="skeleton h-8 mb-2"></div>
+                        <div class="skeleton h-8 mb-2"></div>
+                    </div>
+                </div>
+                
+                <!-- Модели -->
+                <div class="models-section">
+                    <h2 class="category-section-title">Доступные модели</h2>
+                    <div id="models-container">
+                        <!-- Сюда будут добавляться модели через JavaScript -->
+                        <div class="skeleton h-16 mb-2"></div>
+                        <div class="skeleton h-16 mb-2"></div>
+                        <div class="skeleton h-16 mb-2"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Основная область контента -->
+            <div id="main-content">
+                <!-- Панель переключения режимов -->
+                <div class="mode-panel">
+                    <div class="flex justify-between">
+                        <div class="mode-buttons">
+                            <button id="mode-single" class="mode-btn mode-btn-single">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                                </svg>
+                                Одна модель
+                            </button>
+                            <button id="mode-compare" class="mode-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z" />
+                                </svg>
+                                Сравнение моделей
+                            </button>
+                        </div>
+                        <div class="mode-utils">
+                            <button id="toggle-settings" class="util-btn" aria-label="Настройки" title="Настройки">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <button id="clear-chat" class="util-btn" aria-label="Очистить чат" title="Очистить чат">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Информация о выбранных моделях -->
+                    <div id="selected-models-container">
+                        <div id="model-1-info" class="model-tag model-tag-1 hidden">
+                            <span class="model-name"></span>
+                            <button class="model-tag-close">×</button>
+                        </div>
+                        
+                        <div id="model-2-info" class="model-tag model-tag-2 hidden">
+                            <span class="model-name"></span>
+                            <button class="model-tag-close">×</button>
+                        </div>
+                        
+                        <div id="no-model-selected" class="no-model-message">
+                            Выберите модель из списка слева
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Панель шаблонов промтов (скрыта по умолчанию) -->
+                <div id="templates-panel" class="hidden">
+                    <div class="panel-header">
+                        <h2>Шаблоны промтов</h2>
+                        <button id="create-template-btn" class="btn-small">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 01-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                            Новый шаблон
+                        </button>
+                    </div>
+                    <div class="templates-filter">
+                        <input type="text" id="template-search" placeholder="Поиск шаблона..." class="input-search">
+                        <select id="template-tag-filter" class="select-filter">
+                            <option value="">Все теги</option>
+                        </select>
+                    </div>
+                    <div id="templates-list" class="templates-list">
+                        <!-- Шаблоны будут добавлены через JavaScript -->
+                        <div class="skeleton h-20 mb-2"></div>
+                        <div class="skeleton h-20 mb-2"></div>
+                    </div>
+                </div>
+
+                <!-- Область чата -->
+                <div id="chat-container">
+                    <!-- Одиночный чат -->
+                    <div id="chat-area-single" class="chat-area">
+                        <div class="chat-messages" id="chat-messages-single">
+                            <div class="chat-empty-state">
+                                <div class="chat-empty-icon">💬</div>
+                                <div class="chat-empty-text">
+                                    <h3>Добро пожаловать в Промт Арену!</h3>
+                                    <p>Выберите модель и отправьте промт, чтобы начать беседу.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Область сравнения (скрыта по умолчанию) -->
+                    <div id="chat-area-compare" class="comparison-container hidden">
+                        <!-- Слева: Модель 1 -->
+                        <div class="comparison-panel">
+                            <div class="comparison-header">
+                                <h3 id="comparison-model-1-name">Модель 1</h3>
+                                <!-- Параметры модели 1 -->
+                                <div class="model-params-container">
+                                    <button class="model-params-toggle" id="model1-params-toggle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="model-params-panel hidden" id="model1-params-panel">
+                                <div class="model-params-header">
+                                    <h4 class="model-params-title">Параметры модели</h4>
+                                </div>
+                                <div class="model-params-content">
+                                    <div class="model-param-group">
+                                        <label for="model1-temperature" class="model-param-label">Температура</label>
+                                        <div class="range-container">
+                                            <input type="range" id="model1-temperature" class="model-param-input" min="0" max="2" step="0.1" value="0.7">
+                                            <span id="model1-temperature-value" class="model-param-value">0.7</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-param-group">
+                                        <label for="model1-max-tokens" class="model-param-label">Максимум токенов</label>
+                                        <div class="range-container">
+                                            <input type="range" id="model1-max-tokens" class="model-param-input" min="16" max="4096" step="16" value="1024">
+                                            <span id="model1-max-tokens-value" class="model-param-value">1024</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-param-group">
+                                        <label for="model1-system-prompt" class="model-param-label">Системный промт</label>
+                                        <textarea id="model1-system-prompt" class="model-param-textarea" placeholder="Введите системный промт для модели..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comparison-messages" id="comparison-messages-1">
+                                <div class="ai-message">
+                                    <div class="message-header">
+                                        <div class="message-avatar">AI 1</div>
+                                    </div>
+                                    <div class="message-content">
+                                        <div class="loading-message">Ожидание запроса...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Справа: Модель 2 -->
+                        <div class="comparison-panel">
+                            <div class="comparison-header">
+                                <h3 id="comparison-model-2-name">Модель 2</h3>
+                                <!-- Параметры модели 2 -->
+                                <div class="model-params-container">
+                                    <button class="model-params-toggle" id="model2-params-toggle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="model-params-panel hidden" id="model2-params-panel">
+                                <div class="model-params-header">
+                                    <h4 class="model-params-title">Параметры модели</h4>
+                                </div>
+                                <div class="model-params-content">
+                                    <div class="model-param-group">
+                                        <label for="model2-temperature" class="model-param-label">Температура</label>
+                                        <div class="range-container">
+                                            <input type="range" id="model2-temperature" class="model-param-input" min="0" max="2" step="0.1" value="0.7">
+                                            <span id="model2-temperature-value" class="model-param-value">0.7</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-param-group">
+                                        <label for="model2-max-tokens" class="model-param-label">Максимум токенов</label>
+                                        <div class="range-container">
+                                            <input type="range" id="model2-max-tokens" class="model-param-input" min="16" max="4096" step="16" value="1024">
+                                            <span id="model2-max-tokens-value" class="model-param-value">1024</span>
+                                        </div>
+                                    </div>
+                                    <div class="model-param-group">
+                                        <label for="model2-system-prompt" class="model-param-label">Системный промт</label>
+                                        <textarea id="model2-system-prompt" class="model-param-textarea" placeholder="Введите системный промт для модели..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comparison-messages" id="comparison-messages-2">
+                                <div class="ai-message">
+                                    <div class="message-header">
+                                        <div class="message-avatar">AI 2</div>
+                                    </div>
+                                    <div class="message-content">
+                                        <div class="loading-message">Ожидание запроса...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Элементы управления сравнением -->
+                        <div class="comparison-controls">
+                            <button id="winner-model1-btn" class="comparison-winner-btn" disabled>Модель 1 лучше</button>
+                            <button id="winner-tie-btn" class="comparison-winner-btn" disabled>Ничья</button>
+                            <button id="winner-model2-btn" class="comparison-winner-btn" disabled>Модель 2 лучше</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Поле ввода промта -->
+                <div class="prompt-input-container">
+                    <div class="prompt-textarea-wrapper">
+                        <textarea id="prompt-input" placeholder="Введите ваш промт здесь..." aria-label="Промт для отправки модели"></textarea>
+                        <div class="char-counter" id="char-counter">0</div>
+                        <button id="send-button" disabled>
+                            <span class="send-button-text">Отправить</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Нижняя панель (редактор/визуализатор) -->
+        <section id="output-area" style="display: none;">
+            <div class="output-header">
+                <div class="output-tabs">
+                    <button id="toggle-visualizer" class="output-tab active">Визуализатор</button>
+                    <button id="toggle-editor" class="output-tab">Редактор</button>
+                </div>
+                <div class="output-controls">
+                    <select id="editor-language" class="language-select" aria-label="Язык кода">
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="json">JSON</option>
+                    </select>
+                    <button id="toggle-run" class="run-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="run-button-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                        </svg>
+                        Запустить
+                    </button>
+                </div>
+                <button id="toggle-output-panel" class="toggle-output-button" aria-label="Свернуть панель">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <div class="output-content">
+                <div id="code-visualizer"></div>
+                <div id="code-editor" class="hidden"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="api-keys-modal" class="modal-backdrop hidden">
+        <div class="modal-content" role="dialog" aria-labelledby="api-keys-title">
+            <div class="modal-header">
+                <h2 id="api-keys-title" class="modal-title">Настройка API ключей</h2>
+                <button class="modal-close close-modal" aria-label="Закрыть">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="api-key-description">
+                    Добавьте API ключи провайдеров для работы с их моделями. 
+                    Ключи шифруются перед сохранением в базе данных. 
+                    Без ключей вы не сможете использовать модели соответствующих провайдеров.
+                </p>
+                <div id="api-keys-container" class="api-keys-container">
+                    <!-- Список API ключей будет добавлен через JavaScript -->
+                    <div class="skeleton h-20 mb-3"></div>
+                    <div class="skeleton h-20 mb-3"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary close-modal">Отмена</button>
+                <button id="save-api-keys" class="btn-primary">Сохранить</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="leaderboard-modal" class="modal-backdrop hidden">
+        <div class="modal-content" role="dialog" aria-labelledby="leaderboard-title">
+            <div class="modal-header">
+                <h2 id="leaderboard-title" class="modal-title">Лидерборд моделей</h2>
+                <button class="modal-close close-modal" aria-label="Закрыть">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="leaderboard-filter">
+                    <label for="leaderboard-category" class="leaderboard-filter-label">Фильтр по категории:</label>
+                    <select id="leaderboard-category" class="leaderboard-filter-select">
+                        <option value="">Все категории</option>
+                        <!-- Список категорий будет добавлен через JavaScript -->
+                    </select>
+                </div>
+                <div class="overflow-auto">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Ранг</th>
+                                <th>Модель</th>
+                                <th>Провайдер</th>
+                                <th>Категория</th>
+                                <th>Средний рейтинг</th>
+                                <th>Кол-во оценок</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-data">
+                            <!-- Данные лидерборда будут добавлены через JavaScript -->
+                            <tr>
+                                <td colspan="7" class="text-center text-gray-500 py-4">Загрузка данных...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Форма логина (если пользователь не авторизован) -->
+    <div id="login-modal" class="modal-backdrop hidden">
+        <div class="modal-content login-container" role="dialog" aria-labelledby="login-title">
+            <div class="modal-header">
+                <h2 id="login-title" class="modal-title">Вход в систему</h2>
+            </div>
+            <div class="modal-body">
+                <form id="login-form" class="login-form">
+                    <div class="form-group">
+                        <label for="login-username" class="form-label">Имя пользователя</label>
+                        <input type="text" id="login-username" class="form-input" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password" class="form-label">Пароль</label>
+                        <input type="password" id="login-password" class="form-input" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="login-button">Войти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для шаблонов промтов -->
+    <div id="template-modal" class="modal-backdrop hidden">
+        <div class="modal-content" role="dialog" aria-labelledby="template-modal-title">
+            <div class="modal-header">
+                <h2 id="template-modal-title" class="modal-title">Новый шаблон промта</h2>
+                <button class="modal-close" aria-label="Закрыть">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="templateForm">
+                    <div class="template-form-group">
+                        <label for="templateName" class="template-form-label">Название</label>
+                        <input type="text" id="templateName" class="template-form-input" required>
+                    </div>
+                    <div class="template-form-group">
+                        <label for="templateDescription" class="template-form-label">Описание</label>
+                        <input type="text" id="templateDescription" class="template-form-input">
+                    </div>
+                    <div class="template-form-group">
+                        <label for="templatePromptText" class="template-form-label">Текст промта</label>
+                        <textarea id="templatePromptText" class="template-form-textarea" required></textarea>
+                    </div>
+                    <div class="template-form-group">
+                        <label for="templateTags" class="template-form-label">Теги (через запятую)</label>
+                        <input type="text" id="templateTags" class="template-form-input" placeholder="ai, творчество, код...">
+                    </div>
+                    <div class="template-form-group">
+                        <label class="template-form-checkbox-label">
+                            <input type="checkbox" id="templateIsPublic" class="template-form-checkbox" checked>
+                            Публичный шаблон (доступен всем пользователям)
+                        </label>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary modal-cancel">Отмена</button>
+                        <button type="submit" class="btn btn-primary" id="template-save-btn">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Шаблоны для JavaScript -->
+    <template id="model-item-template">
+        <div class="model-item">
+            <div class="model-info">
+                <div class="model-name"></div>
+                <div class="model-provider"></div>
+            </div>
+            <span class="model-category-badge"></span>
+        </div>
+    </template>
+
+    <template id="category-item-template">
+        <div class="category-item">
+            <span class="category-name"></span>
+        </div>
+    </template>
+
+    <template id="user-message-template">
+        <div class="chat-message user-message">
+            <div class="message-header">
+                <div class="message-avatar">Я</div>
+                <div class="message-timestamp"></div>
+            </div>
+            <div class="message-content"></div>
+        </div>
+    </template>
+
+    <template id="ai-message-template">
+        <div class="chat-message ai-message">
+            <div class="message-header">
+                <div class="message-avatar">AI</div>
+                <div class="message-timestamp"></div>
+            </div>
+            <div class="message-content"></div>
+        </div>
+    </template>
+
+    <template id="notification-template">
+        <div class="notification">
+            <div class="notification-icon"></div>
+            <div class="notification-content">
+                <div class="notification-title"></div>
+                <div class="notification-message"></div>
+            </div>
+            <button class="notification-close" aria-label="Закрыть уведомление">&times;</button>
+        </div>
+    </template>
+
+    <template id="prompt-template-item-template">
+        <div class="template-item">
+            <div class="template-info">
+                <div class="template-name"></div>
+                <div class="template-description"></div>
+                <div class="template-tags"></div>
+            </div>
+            <div class="template-actions">
+                <button class="template-use-btn" title="Использовать шаблон">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v4a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" />
+                        <path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h8a2 2 0 00-2-2H5z" />
+                    </svg>
+                </button>
+                <button class="template-edit-btn" title="Редактировать шаблон">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                </button>
+                <button class="template-delete-btn" title="Удалить шаблон">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Скрипты -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0/min/vs/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.1/dist/purify.min.js"></script>
+    <script src="/static/js/auth-fix.js"></script>
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

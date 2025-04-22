@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  prompt-arena:
+    build:
+      context: .
+      dockerfile: Dockerfile-new
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./data:/app/data
+      - ./frontend:/app/frontend
+    environment:
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-BEAaatnZAwNNGgN333h8MyrFvC5t6rGgoEmWOOZ29AU=}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-efd99c5e7b5baa0a5ec11bf26b2908732f933d60dc27a492b5c15b45539073a9}
+      - DATABASE_URL=sqlite+aiosqlite:///./data/prompt_arena.db
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=["*"]
+      - PYTHONPATH=/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import huggingface_hub; print('huggingface_hub version:', huggingface_hub.__version__); from huggingface_hub import AsyncInferenceClient, HfApi; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000

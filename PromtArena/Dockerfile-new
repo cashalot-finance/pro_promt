@@ -1,0 +1,57 @@
+FROM python:3.11-slim
+
+# Установка необходимых системных зависимостей
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем файл зависимостей
+COPY backend/requirements.txt .
+
+# Обновляем pip и устанавливаем huggingface_hub явно перед другими зависимостями
+RUN pip install --no-cache-dir --upgrade pip && \
+    # Удаляем существующую установку huggingface_hub, если есть
+    pip uninstall -y huggingface_hub && \
+    # Устанавливаем huggingface_hub явно с указанной версией
+    pip install --no-cache-dir huggingface_hub==0.23.0 && \
+    # Проверяем установку
+    pip list | grep huggingface-hub && \
+    # Проверяем структуру версии 0.23.0
+    python -c "import huggingface_hub; print('huggingface_hub version:', huggingface_hub.__version__); print('Has inference module:', hasattr(huggingface_hub, 'inference')); print('Inference module structure:', dir(huggingface_hub.inference) if hasattr(huggingface_hub, 'inference') else 'Not available')" && \
+    # Создаем отдельный файл requirements без huggingface_hub
+    grep -v "huggingface_hub" requirements.txt > requirements_without_hf.txt && \
+    cat requirements_without_hf.txt && \
+    # Устанавливаем остальные зависимости
+    pip install --no-cache-dir -r requirements_without_hf.txt && \
+    # Проверяем, что huggingface_hub все еще установлен с правильной версией
+    pip list | grep huggingface-hub && \
+    # Проверяем импорт через Python
+    python -c "import huggingface_hub; print('huggingface_hub version:', huggingface_hub.__version__, 'path:', huggingface_hub.__file__)" && \
+    # Проверяем доступность критических классов - без проверки InferenceTimeoutError
+    python -c "from huggingface_hub import AsyncInferenceClient, HfApi; print('AsyncInferenceClient and HfApi successfully imported')" && \
+    # Финальное сообщение
+    echo "Проверка зависимостей завершена успешно"
+
+# Создаем необходимые директории
+RUN mkdir -p /app/data && \
+    mkdir -p /app/frontend/static/uploads && \
+    mkdir -p /app/frontend/static/css && \
+    mkdir -p /app/frontend/static/js
+
+# Устанавливаем переменную окружения PYTHONPATH
+ENV PYTHONPATH=/app
+
+# Копируем остальные файлы
+COPY backend /app/backend
+COPY frontend /app/frontend
+
+# Проверяем, что наша обновленная обработка InferenceTimeoutError работает
+#RUN python -c "import sys; sys.path.append('/app'); from backend.models_io import safe_import, check_huggingface_version; print('Safe import works!'); print('HF version check:', check_huggingface_version())"
+
+# Команда по умолчанию
+CMD ["python", "-m", "backend.main"]
